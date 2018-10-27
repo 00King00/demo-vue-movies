@@ -19,7 +19,7 @@
 
 					<div class="wrap-input100 validate-input" data-validate="Password is required">
 						<span class="label-input100">Password</span>
-						<input 
+						<input
 							class="input100" type="password" name="pass" placeholder="Type your password"
 							v-model="pass"
 						>
@@ -35,7 +35,7 @@
 					<div class="container-login100-form-btn">
 						<div class="wrap-login100-form-btn">
 							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn" 
+							<button class="login100-form-btn"
 							@click.prevent="Logining(
 								{ username, pass
 							})">
@@ -92,14 +92,6 @@ export default {
 	},
 	computed:{
 		...mapGetters(['logIn']),
-		moviesPage() {
-			if (this.logIn){
-				this.$router.push({name: 'movies'})
-				console.log(this.logIn)
-			}else{
-				alert("Not login yet");
-			}
-		}
 		
 	},
 	methods:{
@@ -109,6 +101,13 @@ export default {
 		Logining(params) {
 			this.LogIn(params);
 		},
+		moviesPage(){
+			if (this.logIn){
+				this.$router.push({name: 'movies'});
+			}else{
+				alert("Not login yet");
+			}
+		}
 	},
 	
 
