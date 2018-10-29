@@ -3,13 +3,12 @@
 		<div class="container-flex">
 			<div class="movies-list">
 				<ul>
-					<li v-for="(item, index) in filteredList" :key="index">
+					<li v-for="(item, index) in  displayedPosts" :key="index">
 						<button type="button" class="close" aria-label="Close" @click="deleteMovie(index)">
 							<span aria-hidden="true">&times;</span>
 						</button>
 						<h3>{{item.title}}</h3>
 						<span>{{item.description}}</span>
-
 					</li>
 				</ul>
 			</div>
@@ -20,9 +19,13 @@
 				<button class="btn btn-primary" type="button" name="button" @click="addMovie">Save</button>
 				<br>
 				<br>
-				<h2>Find your movie</h2>
+				<h2 @click="test">Find your movie</h2>
 				<input type="text" v-model="search" placeholder="find your movie">
-
+				<div class="container-flex">
+					<button type="button" class="btn btn-sm btn-outline-secondary fa fa-angle-double-left" v-if="page != 1" @click="page--"></button>
+					<button type="button" class="btn btn-sm btn-outline-secondary" v-for="(pageNumber, index) in pages" :key="index" @click="page = pageNumber"> {{pageNumber}} </button>
+					<button type="button" @click="page++" v-if="page < pages.length" class="btn btn-sm btn-outline-secondary fa fa-angle-double-right"></button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -33,21 +36,30 @@ import { mapGetters } from "vuex";
 export default {
 	name: 'movies',
 	data(){
-		return{
+		return {
 			title: "",
 			description: "",
-			search: ""
+			search: "",
+			page: 1,
+			perPage: 4,
+			pages: []
 		}
 	},
 	computed:{
 		...mapGetters(["currentUser"]),
 		filteredList(){
 			return this.currentUser.movies.filter( post => {
-			   return post.title.toLowerCase().includes(this.search.toLowerCase());
-		   })
+				return post.title.toLowerCase().includes(this.search.toLowerCase());
+			})
+		},
+		displayedPosts () {
+			return this.paginate(this.filteredList);
 		}
 	},
 	methods:{
+		test(){
+			console.log(this.pages)
+		},
 		addMovie(){
 			if(this.title.length > 0 ){
 				this.$store.commit("addMovie", {"title": this.title, "description": this.description});
@@ -58,6 +70,28 @@ export default {
 		},
 		deleteMovie(index){
 			this.$store.commit("deleteMovie", index);
+		},
+		setPages () {
+			this.pages.length = 0;
+			let numberOfPages = Math.ceil(this.filteredList.length / this.perPage);
+			for (let index = 1; index <= numberOfPages; index++) {
+			this.pages.push(index);
+			}
+		},
+		paginate (posts) {
+			let page = this.page;
+			let perPage = this.perPage;
+			let from = (page * perPage) - perPage;
+			let to = (page * perPage);
+			return  posts.slice(from, to);
+		}
+	},
+	created(){
+		this.setPages();
+	},
+	watch: {
+		displayedPosts(){
+			this.setPages();
 		}
 	}
 
